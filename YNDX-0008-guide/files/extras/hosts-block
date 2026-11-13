@@ -1,0 +1,13 @@
+127.0.0.1       localhost
+::1             ip6-localhost
+
+# OTA / firmware: только эти домены. quasar.yandex.net НЕ блокируем —
+# это основной бэкенд станции (Алиса, регистрация, музыка).
+127.0.0.1       quasar.s3.yandex.net
+::1             quasar.s3.yandex.net
+127.0.0.1       updater.mobile.yandex.net
+::1             updater.mobile.yandex.net
+127.0.0.1       ota.yandex.net
+::1             ota.yandex.net
+127.0.0.1       ota.yandex.ru
+::1             ota.yandex.ru

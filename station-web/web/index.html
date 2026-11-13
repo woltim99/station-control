@@ -1,0 +1,959 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Station Control · Моя Станция</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='9'%20fill='%23121a1c'/%3E%3Cpath%20d='M9%2022V10h14v12M13%2016h6'%20fill='none'%20stroke='%23a7f3cf'%20stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css?v=31">
+  <link rel="stylesheet" href="/controls.css?v=29">
+  <link rel="stylesheet" href="/extra.css?v=32">
+  <link rel="stylesheet" href="/palette.css?v=29">
+  <link rel="stylesheet" href="/themes.css?v=37">
+</head>
+<body>
+<svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+  <symbol id="i-grid" viewbox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></symbol>
+  <symbol id="i-shield" viewbox="0 0 24 24"><path d="m12 3 8 3v6c0 4-4 7-8 9-4-2-8-5-8-9V6z"></path><path d="m8 12 3 3 5-6"></path></symbol>
+  <symbol id="i-box" viewbox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5zM3 8v9l9 5 9-5V8M12 13v9M7 5.8l9 5"></path></symbol>
+  <symbol id="i-log" viewbox="0 0 24 24"><path d="M5 3h11l3 3v15H5zM9 9h6M9 13h6M9 17h4"></path></symbol>
+  <symbol id="i-refresh" viewbox="0 0 24 24"><path d="M20 10a8 8 0 1 0-1.5 7M20 4v6h-6"></path></symbol>
+  <symbol id="i-arrow" viewbox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"></path></symbol>
+  <symbol id="i-down" viewbox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"></path></symbol>
+  <symbol id="i-link" viewbox="0 0 24 24"><path d="m9 15 6-6M8 17l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 8a4 4 0 0 0 6 0l4-4a4 4 0 0 0-6-6l-1 1"></path></symbol>
+  <symbol id="i-cpu" viewbox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"></rect><path d="M9 1v5m6-5v5M9 18v5m6-5v5M1 9h5m-5 6h5m12-6h5m-5 6h5"></path></symbol>
+  <symbol id="i-network" viewbox="0 0 24 24"><rect x="8" y="2" width="8" height="6" rx="1"></rect><path d="M12 8v5M4 17v-4h16v4"></path></symbol>
+  <symbol id="i-wifi" viewbox="0 0 24 24"><path d="M2 8a16 16 0 0 1 20 0M5 12a11 11 0 0 1 14 0M8.5 16a6 6 0 0 1 7 0"></path><circle cx="12" cy="20" r="1"></circle></symbol>
+  <symbol id="i-bt" viewbox="0 0 24 24"><path d="m7 7 10 10-5 5V2l5 5L7 17"></path></symbol>
+  <symbol id="i-light" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"></path></symbol>
+  <symbol id="i-term" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="m7 9 3 3-3 3M13 15h4"></path></symbol>
+  <symbol id="i-screen" viewbox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></symbol>
+  <symbol id="i-check" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></symbol>
+</defs></svg>
+
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="Station Control"><span class="brand-mark">s<span>•</span></span><span>station<span class="brand-light">control</span></span></a>
+  <div class="workspace-label">Устройство</div>
+  <div class="device-switch">
+    <span class="mini-station"></span>
+    <div><strong>Станция Макс</strong><small>личный стенд</small></div>
+    <span id="sidebar-dot" class="status-dot pending"></span>
+  </div>
+  <nav aria-label="Разделы панели">
+    <button class="nav-item active" data-view="overview" type="button"><svg><use href="#i-grid"></use></svg>Обзор<span class="nav-index">01</span></button>
+    <button class="nav-item" data-view="access" type="button"><svg><use href="#i-shield"></use></svg>Доступ<span class="nav-index">02</span></button>
+    <button class="nav-item" data-view="device" type="button"><svg><use href="#i-network"></use></svg>Устройство<span class="nav-index">03</span></button>
+    <button class="nav-item" data-view="light" type="button"><svg><use href="#i-light"></use></svg>Свет<span class="nav-index">04</span></button>
+    <button class="nav-item" data-view="journal" type="button"><svg><use href="#i-log"></use></svg>Журнал<span class="nav-index">05</span></button>
+    <button class="nav-item" data-view="backups" type="button"><svg><use href="#i-box"></use></svg>Резервные копии<span class="nav-index" id="backup-count-nav">06</span></button>
+    <button class="nav-item" data-view="features" type="button"><svg><use href="#i-check"></use></svg>Возможности<span class="nav-index">07</span></button>
+    <button class="nav-item" data-view="settings" type="button"><svg><use href="#i-shield"></use></svg>Настройки<span class="nav-index">08</span></button>
+    <button class="nav-item" data-view="console" type="button"><svg><use href="#i-term"></use></svg>Консоль<span class="nav-index">09</span></button>
+  </nav>
+  <div class="sidebar-bottom">
+    <span class="local-dot"></span>
+    <div><strong>локальный сервер</strong><small id="server-address">станция</small></div>
+    <span class="version" id="app-version" role="button" tabindex="0" title="История версий">v{{VERSION}}</span>
+  </div>
+</aside>
+
+<main>
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow device-model">STATION MAX В· <span id="heading-model">YANDEXSTATION_2</span></p>
+      <h1 id="page-title">Моя Станция Макс</h1>
+      <p class="subtitle" id="page-subtitle">Панель работает на самой станции</p>
+    </div>
+    <div class="heading-actions">
+      <div class="connection-pill" id="connection-pill"><span class="status-dot pending" id="conn-dot"></span><span id="conn-text">подключение…</span></div>
+      <button class="button subtle" id="theme-button" type="button" title="Переключить тему"><svg><use href="#i-light"></use></svg>Тема</button>
+      <button class="button subtle" id="refresh-button" type="button"><svg><use href="#i-refresh"></use></svg>Обновить</button>
+      <div class="theme-pop hidden" id="theme-pop">
+        <div class="pop-label">Палитра</div>
+        <button class="theme-swatch" data-accent="lime" type="button"><i style="--c:#b8f36b"></i>Лайм</button>
+        <button class="theme-swatch" data-accent="mint" type="button"><i style="--c:#b6e6ca"></i>Мята</button>
+        <button class="theme-swatch" data-accent="amber" type="button"><i style="--c:#e9c18c"></i>Янтарь</button>
+        <button class="theme-swatch" data-accent="ice" type="button"><i style="--c:#8fd3ff"></i>Лёд</button>
+        <button class="theme-swatch" data-accent="mono" type="button"><i style="--c:#d9d9d9"></i>Ч/Б</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="view" id="view-overview">
+    <div class="overview-top">
+      <article class="card device-card">
+        <div class="card-kicker"><span class="status-dot pending" id="device-dot"></span><span id="device-state">проверяем станцию</span><span class="tag">MAX</span></div>
+        <div class="device-content">
+          <div class="device-copy">
+            <h2>Станция Макс<span id="device-summary" class="device-summary">подключена по Wi-Fi</span></h2>
+            <div class="device-address"><svg><use href="#i-link"></use></svg><code id="device-address">—</code><button class="text-button" id="copy-address" type="button">Скопировать</button></div>
+            <div class="device-chips"><span id="android-chip">Android —</span><span id="build-chip">build —</span><span id="selinux-chip">SELinux —</span></div>
+          </div>
+          <figure class="station-visual">
+            <div class="station-visual-stage">
+              <img class="station-product-image" src="/assets/station-max-unlit-v2.png" alt="Станция Макс">
+              <canvas class="ring-live" id="ring-live" width="1254" height="1254" aria-hidden="true"></canvas>
+              <button class="station-hotspot station-hotspot-ring" id="ring-open" type="button" aria-label="Открыть кольцо"><span>Кольцо</span></button>
+              <button class="station-hotspot station-hotspot-display" id="matrix-open" type="button" aria-label="Открыть матрицу"><canvas id="station-matrix-live" width="500" height="320"></canvas><span>Матрица</span></button>
+            </div>
+            <figcaption>нажмите на кольцо или матрицу</figcaption>
+          </figure>
+        </div>
+        <div class="alice-say device-alice">
+          <input id="alice-text" type="text" placeholder="Скажите Алисе: включи музыку" autocomplete="off" maxlength="200">
+          <button class="button subtle" id="alice-send" type="button">Отправить</button>
+        </div>
+        <div class="device-footer"><span><i class="live-line"></i><span id="last-updated">ещё не обновлялось</span></span><span id="transport-status">SSH + ADB</span></div>
+      </article>
+
+      <article class="card media-card player-card">
+        <div class="card-heading"><h3>Музыка и громкость</h3><span class="state muted" id="media-state">локальное управление</span></div>
+        <div class="media-body">
+          <div class="music-player">
+            <div class="music-art" id="music-art">♪</div>
+            <div class="music-info"><strong id="track-title">Активная сессия не найдена</strong><span id="track-artists">управление через Glagol</span>
+              <div class="source-switch" id="media-source" hidden>
+                <button data-source="airplay" type="button">AirPlay</button>
+                <button data-source="glagol" type="button">Я.Музыка</button>
+              </div>
+              <div class="music-controls">
+                <button id="track-previous" type="button" title="Предыдущий">⏮</button>
+                <button id="track-toggle" type="button" title="Пауза">⏯</button>
+                <button id="track-next" type="button" title="Следующий">⏭</button>
+              </div>
+            </div>
+          </div>
+          <div class="music-progress" id="music-progress-block" hidden>
+            <input type="range" id="music-progress" min="0" max="0" value="0" step="1" aria-label="Позиция трека">
+            <div class="music-time"><span id="music-time-current">0:00</span><span id="music-time-total">0:00</span></div>
+          </div>
+          <label for="media-volume">Громкость <strong id="media-volume-value">—</strong></label>
+          <div class="volume-controls"><input type="range" id="media-volume" min="0" max="100" value="0"></div>
+          <small id="media-detail">Текущая громкость STREAM_MUSIC</small>
+        </div>
+      </article>
+
+      <article class="card access-card">
+        <div class="card-heading"><h3>Подключения</h3><svg class="muted-icon"><use href="#i-link"></use></svg></div>
+        <div class="access-controls">
+          <section class="connection-tile">
+            <div class="access-control">
+              <div class="access-control-label"><strong>Wi-Fi</strong><small><span id="wifi-current">—</span> <span id="wifi-bars" class="signal-bars" aria-hidden="true"></span></small></div>
+              <button class="icon-button" id="wifi-open-overview" type="button" aria-label="Настроить Wi-Fi"><svg><use href="#i-arrow"></use></svg></button>
+              <span class="status-dot ok" id="wifi-dot"></span>
+            </div>
+          </section>
+          <section class="connection-tile">
+            <div class="access-control"><div class="access-control-label"><strong>Bluetooth</strong><small id="bluetooth-state">—</small></div>
+              <button class="icon-button" id="bt-open-overview" type="button" aria-label="Устройства Bluetooth"><svg><use href="#i-arrow"></use></svg></button>
+              <button id="bluetooth-toggle" class="system-switch" role="switch" aria-checked="false" type="button"><span></span></button>
+            </div>
+          </section>
+          <section class="connection-tile">
+            <div class="access-control">
+              <div class="access-control-label"><strong>Live-view</strong><small id="liveview-state">включён</small></div>
+              <button id="liveview-toggle" class="system-switch" role="switch" aria-checked="true" type="button"><span></span></button>
+            </div>
+          </section>
+          <section class="connection-tile">
+            <div class="access-control">
+              <div class="access-control-label"><strong>AirPlay</strong><small id="airplay-state">проверяю…</small></div>
+              <button id="airplay-name-open" class="airplay-mini" type="button" title="Имя в AirPlay">Имя</button>
+              <button id="airplay-play" class="airplay-mini" type="button" title="Пауза / продолжить" hidden>⏯</button>
+              <button id="airplay-toggle" class="system-switch" role="switch" aria-checked="false" type="button"><span></span></button>
+            </div>
+          </section>
+          <section class="connection-tile">
+            <div class="access-control">
+              <div class="access-control-label"><strong>Визуализация</strong><small id="viz-state">включена</small></div>
+              <span id="viz-mode" class="viz-mode" hidden>—</span>
+            </div>
+          </section>
+          <section class="connection-tile">
+            <div class="access-control">
+              <div class="access-control-label"><strong>Экран и пульт</strong><small>live-экран станции</small></div>
+              <button class="button subtle" id="tv-open" type="button" title="Открыть AirPlay-экран на ТВ">AirPlay-экран</button>
+              <button class="button subtle" id="ap-video" type="button" title="Открыть приёмник AirPlay-видео">AirPlay видео</button>
+              <button class="icon-button" id="screen-open-overview" type="button" aria-label="Открыть экран и пульт"><svg><use href="#i-screen"></use></svg></button>
+            </div>
+          </section>
+        </div>
+      </article>
+    </div>
+
+    <div class="metric-grid">
+      <article class="card metric-card"><div class="metric-top"><span>Память</span><span class="small-tag">RAM</span></div>
+        <div class="metric-main"><div><strong id="memory-used">—</strong><span class="metric-unit"> МБ</span><p>из <span id="memory-total">—</span> МБ</p></div>
+          <svg class="ring" viewbox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="34"></circle><circle id="memory-ring" class="ring-value" cx="42" cy="42" r="34"></circle><text id="memory-percent" x="42" y="47">—</text></svg>
+        </div>
+        <div class="metric-foot" id="memory-available">—</div></article>
+      <article class="card metric-card"><div class="metric-top"><span>Хранилище</span><span class="small-tag">/data</span></div>
+        <div class="metric-main"><div><strong id="disk-free">—</strong><span class="metric-unit"> ГБ</span><p>свободно из <span id="disk-total">—</span> ГБ</p></div>
+          <svg class="ring" viewbox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="34"></circle><circle id="disk-ring" class="ring-value warm" cx="42" cy="42" r="34"></circle><text id="disk-percent" x="42" y="47">—</text></svg>
+        </div>
+        <div class="metric-foot" id="disk-used">—</div></article>
+      <article class="card metric-card"><div class="metric-top"><span>Процессор</span><span class="small-tag">CPU</span></div>
+        <div class="metric-main"><div><strong id="cpu-pct">—</strong><span class="metric-unit"> %</span><p>общая загрузка</p></div>
+          <svg class="ring" viewbox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="34"></circle><circle id="cpu-ring" class="ring-value warm" cx="42" cy="42" r="34"></circle><text id="cpu-percent" x="42" y="47">—</text></svg>
+        </div>
+        <div class="core-line" id="core-line">—</div></article>
+      <article class="card metric-card"><div class="metric-top"><span>Температура</span><span class="small-tag">THERMAL</span></div>
+        <div class="metric-main"><div><strong id="cpu-temperature">—</strong><span class="metric-unit"> °C</span><p>максимум по зонам</p></div></div>
+        <div class="metric-foot" id="temp-detail">—</div></article>
+      <article class="card metric-card"><div class="metric-top"><span>Аптайм</span><svg class="small-icon"><use href="#i-refresh"></use></svg></div>
+        <div class="metric-main"><div><strong id="uptime">—</strong><p id="uptime-detail">с момента загрузки</p></div></div>
+        <div class="metric-foot" id="load-detail">load —</div></article>
+    </div>
+
+    <article class="card">
+      <div class="card-heading"><h3>Сервисы</h3><span class="muted">init.svc.*</span></div>
+      <div class="services" id="services"></div>
+    </article>
+  </section>
+
+  <section class="view hidden" id="view-access">
+    <div class="card">
+      <div class="card-heading"><h3>Доступ и защита</h3><span class="muted">rootd · ADB · SSH · OTA</span></div>
+      <div class="fact-grid">
+        <div class="fact"><span>Root</span><strong id="a-root">—</strong></div>
+        <div class="fact"><span>SELinux</span><strong id="a-selinux">—</strong></div>
+        <div class="fact"><span>ADB</span><strong id="a-adb">—</strong></div>
+        <div class="fact"><span>SSH</span><strong id="a-ssh">—</strong></div>
+        <div class="fact"><span>ADB-ключей</span><strong id="a-keys">—</strong></div>
+        <div class="fact"><span>OTA hosts</span><strong id="a-hosts">—</strong></div>
+        <div class="fact"><span>Апдейтер</span><strong id="a-updater">—</strong></div>
+        <div class="fact"><span>IP</span><strong id="a-ip">—</strong></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-heading"><h3>ADB по сети</h3><span class="muted">порт 5555</span></div>
+      <div class="access-control">
+        <div class="access-control-label"><strong>ADB</strong><small id="adb-toggle-state">—</small></div>
+        <button id="adb-toggle" class="system-switch" role="switch" aria-checked="false" type="button"><span></span></button>
+      </div>
+      <p class="note">Выключите, если отладка по сети не нужна: станция перестанет принимать подключения на 5555. Включить обратно можно здесь же или по SSH (порт 2222).</p>
+    </div>
+    <div class="card">
+      <div class="card-heading"><h3>Подключение</h3><span class="muted">локальная сеть</span></div>
+      <div class="connect-row"><code id="adb-address">—</code><button class="text-button" data-copy="adb-address" type="button">Копировать</button></div>
+      <div class="connect-row"><code id="ssh-address">—</code><button class="text-button" data-copy="ssh-address" type="button">Копировать</button></div>
+      <p class="note">Готовые команды с текущим IP — скопируйте и вставьте в терминал на компьютере.</p>
+    </div>
+    <div class="card">
+      <div class="card-heading"><h3>Резервная копия доступа</h3><span class="muted">/odm/etc + adb_keys</span></div>
+      <p class="note">Снимок «доступов»: <code>/odm/etc</code> (init-конфиги, hosts-блокировка OTA, SSH-ключи) и <code>adb_keys</code> в одном tar.gz. Созданную копию можно скачать, загрузить обратно и восстановить на станции в разделе «Резервные копии»; логин/пароль панели при восстановлении не меняются, после применения конфигов нужна перезагрузка.</p>
+      <button class="button primary" id="access-backup" type="button"><svg><use href="#i-box"></use></svg>Создать копию</button>
+      <span class="state muted" id="access-backup-state"></span>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-settings">
+    <div class="card">
+      <div class="card-heading"><h3>Оформление</h3><span class="muted">палитра панели</span></div>
+      <label class="field-label" for="theme-select">Палитра</label>
+      <select id="theme-select">
+        <option value="lime">Лайм (по умолчанию)</option>
+        <option value="mint">Мята</option>
+        <option value="amber">Янтарь</option>
+        <option value="ice">Лёд</option>
+        <option value="mono">Ч/Б</option>
+      </select>
+      <p class="note">Палитра сохраняется в браузере и применяется к странице входа.</p>
+    </div>
+    <div class="card">
+      <div class="card-heading"><h3>Доступ к панели</h3><span class="muted">логин и пароль</span></div>
+      <div class="cred-form">
+        <label>Логин (можно изменить)<input id="cred-user" autocomplete="username" placeholder="admin"></label>
+        <label>Текущий пароль<input id="cred-current" type="password" autocomplete="current-password"></label>
+        <label>Новый пароль<input id="cred-new" type="password" autocomplete="new-password"></label>
+        <label>Повторите пароль<input id="cred-confirm" type="password" autocomplete="new-password"></label>
+        <button class="button primary" id="cred-save" type="button">Сохранить</button>
+        <span class="state muted" id="cred-state"></span>
+      </div>
+      <p class="note">Здесь меняются <b>и логин, и пароль</b>. Введите текущий пароль, затем новый логин и новый пароль. Минимум 4 символа; после сохранения текущая сессия остаётся, остальные завершаются.</p>
+      <p class="note dialog-warning" id="cred-default-warning" hidden>Сейчас действует пароль по умолчанию <b>admin/admin</b>. Панель доступна всей домашней сети — смените пароль.</p>
+      <p class="note">Пароль хранится на станции в виде хэша PBKDF2-SHA256, открытый текст не сохраняется.</p>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-device">
+    <div class="device-grid">
+      <article class="card">
+        <div class="card-heading"><h3>Wi-Fi</h3><svg class="muted-icon"><use href="#i-wifi"></use></svg></div>
+        <div class="fact-grid">
+          <div class="fact"><span>Сеть</span><strong id="d-ssid">—</strong></div>
+          <div class="fact"><span>IP</span><strong id="d-ip">—</strong></div>
+          <div class="fact"><span>Состояние</span><strong id="d-wifi">—</strong></div>
+          <div class="fact"><span>DNS</span><strong id="d-dns">—</strong></div>
+        </div>
+        <div class="dialog-actions"><button class="button subtle" id="wifi-open" type="button">Выбрать сеть</button></div>
+        <p class="note">Список сетей и подключение теперь доступны из панели.</p>
+      </article>
+      <article class="card">
+        <div class="card-heading"><h3>Bluetooth</h3><svg class="muted-icon"><use href="#i-bt"></use></svg></div>
+        <div class="access-control"><div class="access-control-label"><strong id="d-bt-name">—</strong><small id="d-bt-addr">—</small></div>
+          <button id="bluetooth-toggle-2" class="system-switch" role="switch" aria-checked="false" type="button"><span></span></button>
+        </div>
+        <div class="dialog-actions"><button class="button subtle" id="bt-open" type="button">Устройства</button></div>
+        <p class="note">Сопряжённые устройства и состояние подключения.</p>
+      </article>
+      <article class="card card-wide">
+        <div class="card-heading"><h3>Экран</h3><div class="heading-actions"><button class="button subtle" id="screen-open" type="button">Открыть</button><button class="button subtle" id="screen-refresh" type="button"><svg><use href="#i-refresh"></use></svg>Снимок</button></div></div>
+        <div class="screen-wrap"><img id="screen-img" alt="Снимок экрана станции"><div id="screen-placeholder">Нажмите «Снимок», чтобы получить кадр экрана</div></div>
+      </article>
+      <article class="card">
+        <div class="card-heading"><h3>Питание</h3><span class="muted">осторожно</span></div>
+        <button class="button danger" id="reboot" type="button">Перезагрузить станцию</button>
+        <p class="note">Перезагрузка занимает около минуты; все сервисы поднимутся сами.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-light">
+    <div class="device-grid">
+      <article class="card">
+        <div class="card-heading"><h3>Кольцо</h3><span class="muted" id="ring-state">—</span></div>
+        <p class="note">24 RGB-сегмента: цвет, яркость, дыхание, радуга, градиент и свеча.</p>
+        <button class="button primary" id="ring-open-light" type="button">Открыть кольцо</button>
+      </article>
+      <article class="card">
+        <div class="card-heading"><h3>Матрица</h3><span class="muted">25×16</span></div>
+        <p class="note">Текст, рисунок и GIF на передней LED-матрице станции.</p>
+        <button class="button primary" id="matrix-open-light" type="button">Открыть матрицу</button>
+      </article>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-journal">
+    <div class="card">
+      <div class="card-heading"><h3>Журнал действий</h3>
+        <div class="log-actions">
+          <select id="log-source"><option value="web">Панель</option><option value="sshd">SSH</option><option value="logcat">logcat</option></select>
+          <div class="segmented" id="log-modes">
+            <button data-logmode="human" class="active" type="button">Понятный</button>
+            <button data-logmode="verbose" type="button">Подробный</button>
+          </div>
+          <button class="button subtle" id="log-refresh" type="button"><svg><use href="#i-refresh"></use></svg>Обновить</button>
+        </div>
+      </div>
+      <div id="events-view" class="events"><p class="note">Загрузка журнала…</p></div>
+      <div id="verbose-box" class="hidden">
+        <pre class="log-view" id="log-view">Выберите источник и нажмите «Обновить».</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-backups">
+    <div class="card">
+      <div class="card-heading"><h3>Резервные копии</h3>
+        <div class="log-actions">
+          <button class="button subtle" id="backup-upload" type="button"><svg><use href="#i-down"></use></svg>Загрузить</button>
+          <input type="file" id="backup-file" accept=".gz,.tar.gz,application/gzip" hidden>
+          <button class="button primary" id="backup-create" type="button"><svg><use href="#i-box"></use></svg>Создать</button>
+        </div>
+      </div>
+      <table class="data-table"><thead><tr><th>Файл</th><th>Размер</th><th>Дата</th><th>Действия</th></tr></thead><tbody id="backup-rows"></tbody></table>
+      <p class="note" id="backup-state"></p>
+      <label class="check-row"><input type="checkbox" id="restore-reset-creds"> при восстановлении сбросить логин/пароль панели на <code>admin/admin</code></label>
+      <p class="note">В копию входят <code>/odm/etc</code> (init-конфиги, hosts-блокировка, SSH-ключи), <code>adb_keys</code> и логи. Восстановление перезаписывает конфиги на станции, логин/пароль панели по умолчанию не трогает. После восстановления нужна перезагрузка.</p>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-features">
+    <div class="card">
+      <div class="card-heading"><h3>Возможности</h3><span class="muted">фактическое состояние</span></div>
+      <table class="data-table"><thead><tr><th>Функция</th><th>Состояние</th><th></th></tr></thead><tbody id="feature-rows"></tbody></table>
+    </div>
+  </section>
+
+  <section class="view hidden" id="view-console">
+    <div class="card">
+      <div class="card-heading"><h3>Консоль root</h3><span class="muted">shell, uid 0</span></div>
+      <div class="console-bar"><textarea id="cmd" rows="2" placeholder="например: getprop ro.build.display.id"></textarea><button class="button primary" id="run" type="button">Выполнить</button></div>
+      <pre class="log-view" id="out">Вывод появится здесь.</pre>
+    </div>
+  </section>
+</main>
+
+<footer>локальный сервер на станции · <span id="port"></span></footer>
+<dialog class="workspace-dialog ring-dialog" id="ring-dialog">
+  <div class="dialog-heading">
+    <div><p class="eyebrow">Свет станции</p><h2>Кольцо</h2></div>
+    <button class="icon-button" id="ring-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="ring-workspace">
+    <div class="ring-preview-area">
+      <canvas id="ring-canvas" width="360" height="360"></canvas>
+      <span id="ring-preview-label" class="muted">предпросмотр</span>
+    </div>
+    <form id="ring-form-modal">
+      <div class="ring-tabs" id="ring-tabs">
+        <button data-rtab="manual" class="active" type="button">Ручное</button>
+        <button data-rtab="anim" type="button">Анимации</button>
+      </div>
+      <div class="ring-tab" id="rtab-manual">
+      <label class="field-label" for="ring-color">Цвет</label>
+      <input type="color" id="ring-color" value="#b8f36b">
+      <label class="field-label" for="ring-color2">Второй цвет (для градиента)</label>
+      <input type="color" id="ring-color2" value="#6e62ff">
+      <label class="field-label" for="ring-level">Яркость <strong id="ring-level-value">70</strong>%</label>
+      <input type="range" id="ring-level" min="0" max="100" value="70">
+      <label class="field-label" for="ring-speed">Скорость <strong id="ring-speed-value">35</strong>%</label>
+      <input type="range" id="ring-speed" min="1" max="100" value="35">
+      <div class="ring-profiles">
+        <select id="ring-profile"><option value="">Профили…</option></select>
+        <input type="text" id="ring-profile-name" maxlength="32" placeholder="Название профиля">
+        <button class="button subtle" id="ring-profile-save" type="button">Сохранить</button>
+        <button class="button subtle" id="ring-profile-delete" type="button">Удалить</button>
+      </div>
+      <div class="mode-buttons">
+        <button data-mode="native" type="button">Штатно</button>
+        <button data-mode="off" type="button">Выкл</button>
+        <button data-mode="steady" type="button">Ровно</button>
+        <button data-mode="breathe" type="button">Дыхание</button>
+        <button data-mode="rainbow" type="button">Радуга</button>
+        <button data-mode="gradient" type="button">Градиент</button>
+        <button data-mode="candle" type="button">Свеча</button>
+      </div>
+      <p class="note">Анимации рисуются через fb5 и не отключают штатную индикацию громкости. После изменения громкости цвет возвращается через пару секунд.</p>
+      </div>
+      <div class="ring-tab hidden" id="rtab-anim">
+        <div class="ring-anim-grid" id="ring-anims"></div>
+        <p class="note">Родные шаблоны кольца из прошивки: «Слушает», «Думает», «Говорит», таймер, будильник, звонок и другие. «Вернуть штатно» — внизу.</p>
+      </div>
+      <div class="dialog-actions">
+        <button class="button primary" id="ring-apply" type="button">Применить</button>
+        <button class="button subtle" id="ring-native" type="button">Вернуть штатно</button>
+        <button class="button subtle" id="ring-off" type="button">Выключить</button>
+      </div>
+      <p class="note" id="ring-modal-state">—</p>
+    </form>
+  </div>
+</dialog>
+
+<dialog class="workspace-dialog wifi-dialog" id="wifi-dialog">
+  <div class="dialog-heading wifi-dialog-heading">
+    <div><p class="eyebrow">Сеть станции</p><h2>Wi-Fi</h2></div>
+    <button class="icon-button" id="wifi-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="wifi-current-row">
+    <div><strong id="wifi-modal-current">—</strong><small id="wifi-modal-sub">—</small></div>
+    <span id="wifi-modal-enabled" class="state">—</span>
+  </div>
+  <div class="wifi-list" id="wifi-list"><p class="note">Нажмите «Сканировать», чтобы найти сети.</p></div>
+  <details class="wifi-saved-box" id="wifi-saved-box">
+    <summary>Сохранённые сети</summary>
+    <div class="wifi-saved-list" id="wifi-saved-list"></div>
+  </details>
+  <div class="wifi-selection hidden" id="wifi-selection">
+    <label class="field-label" for="wifi-password">Пароль</label>
+    <input type="password" id="wifi-password" autocomplete="new-password" placeholder="пароль от сети">
+    <div class="dialog-actions">
+      <button class="button primary" id="wifi-connect" type="button">Подключить</button>
+      <button class="button subtle" id="wifi-forget" type="button">Забыть сеть</button>
+      <button class="button subtle" id="wifi-cancel" type="button">Отмена</button>
+    </div>
+  </div>
+  <div class="dialog-actions">
+    <button class="button subtle" id="wifi-scan" type="button">Сканировать</button>
+  </div>
+  <p class="note" id="wifi-modal-state">—</p>
+  <small>Пароль передаётся только станции и не сохраняется в панели.</small>
+</dialog>
+
+<dialog class="workspace-dialog wifi-dialog" id="bt-dialog">
+  <div class="dialog-heading wifi-dialog-heading">
+    <div><p class="eyebrow">Аксессуары</p><h2>Bluetooth</h2></div>
+    <button class="icon-button" id="bt-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="wifi-current-row">
+    <div><strong id="bt-modal-name">—</strong><small id="bt-modal-sub">—</small></div>
+    <span id="bt-modal-enabled" class="state">—</span>
+  </div>
+  <div class="wifi-list" id="bt-list"><p class="note">Загрузка…</p></div>
+  <p class="note" id="bt-modal-state">—</p>
+  <small>Только сопряжённые устройства и их состояние. Поиск и сопряжение — на экране станции.</small>
+</dialog>
+
+<dialog class="workspace-dialog" id="airplay-name-dialog">
+  <div class="dialog-heading">
+    <div><p class="eyebrow">AirPlay</p><h2>Имя приёмника</h2></div>
+    <button class="icon-button" id="airplay-name-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="airplay-name-options">
+    <label class="airplay-name-option">
+      <input type="radio" name="airplay-name-mode" value="smart">
+      <span>Имя станции в Умном доме: <strong id="airplay-smart-name">…</strong></span>
+    </label>
+    <p class="note" id="airplay-smart-note">…</p>
+    <label class="airplay-name-option">
+      <input type="radio" name="airplay-name-mode" value="custom">
+      <span>Своё название</span>
+    </label>
+    <input type="text" id="airplay-custom-name" maxlength="30" placeholder="Например, Гостиная">
+    <p class="note" id="airplay-smart-full"></p>
+  </div>
+  <p class="note">Сейчас: <strong id="airplay-current-name">—</strong></p>
+  <p class="note">Видео-приёмник: <strong id="airplay-video-name">—</strong></p>
+  <p class="note" id="airplay-name-state">—</p>
+  <div class="dialog-actions">
+    <button class="button primary" id="airplay-name-save" type="button">Сохранить</button>
+    <button class="button subtle" id="airplay-name-cancel" type="button">Отмена</button>
+  </div>
+</dialog>
+
+<dialog class="workspace-dialog matrix-dialog" id="matrix-dialog">
+  <div class="dialog-heading">
+    <div><p class="eyebrow">Передняя панель</p><h2>Матрица станции</h2></div>
+    <button class="icon-button" id="matrix-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="matrix-scroll">
+  <div class="matrix-modal-head"><span>Экран станции · 25 × 16</span><span id="matrix-engine">движок: …</span><span>256 оттенков серого</span></div>
+  <div class="matrix-tabs" id="matrix-tabs">
+    <button data-mtab="draw" class="active" type="button">Рисунок</button>
+    <button data-mtab="text" type="button">Текст</button>
+    <button data-mtab="gif" type="button">GIF</button>
+    <button data-mtab="video" type="button">Видео</button>
+    <button data-mtab="anim" type="button">Анимации</button>
+  </div>
+
+  <div class="matrix-tab" id="mtab-draw">
+    <div class="matrix-canvas-wrap">
+      <canvas id="matrix-canvas" width="500" height="320"></canvas>
+      <div class="matrix-canvas-tools">
+        <button data-mtool="brush" class="active" type="button">Кисть</button>
+        <button data-mtool="eraser" type="button">Ластик</button>
+        <button id="matrix-clear" type="button">Очистить</button>
+        <button id="matrix-heart" type="button">Сердце</button>
+        <button id="matrix-pattern" type="button">Узор</button>
+        <button id="matrix-read" type="button">Считать кадр</button>
+      </div>
+      <p class="note">Клик или перетаскивание — рисовать. Ластик стирает пиксели.</p>
+    </div>
+  </div>
+
+  <div class="matrix-tab hidden" id="mtab-anim">
+    <div class="anim-grid" id="matrix-anims"></div>
+    <p class="note">Родные анимации станции: те же GIF, что показывает сама матрица. Запуск — по карточке; «Вернуть штатно» — внизу.</p>
+  </div>
+
+  <div class="matrix-tab hidden" id="mtab-text">
+    <label class="field-label" for="matrix-text">Бегущая строка</label>
+    <input type="text" id="matrix-text" maxlength="64" placeholder="Привет, Станция!">
+    <label class="field-label" for="matrix-speed">Скорость строки</label>
+    <select id="matrix-speed">
+      <option value="100">Медленно</option>
+      <option value="60" selected>Средне</option>
+      <option value="30">Быстро</option>
+    </select>
+    <p class="note">Текст повторяется до окончания выбранного времени.</p>
+  </div>
+
+  <div class="matrix-tab hidden" id="mtab-gif">
+    <label class="field-label" for="matrix-gif">GIF с компьютера</label>
+    <input type="file" id="matrix-gif" accept="image/gif">
+    <p class="note">До 8 МБ, первые 10 секунд, автоматический повтор. Цвета переводятся в градации серого.</p>
+  </div>
+
+  <div class="matrix-tab hidden" id="mtab-video">
+    <label class="field-label" for="matrix-video">Видео с компьютера</label>
+    <input type="file" id="matrix-video" accept="video/*">
+    <p class="note">До 10 секунд, без звука. Браузер разложит ролик на кадры 25×16 и отправит на станцию.</p>
+  </div>
+
+  <div class="matrix-settings" id="matrix-settings">
+    <label class="range-label matrix-setting" id="matrix-brush-row" for="brush-brightness"><span>Яркость кисти</span><output id="brush-brightness-value">255</output><input type="range" id="brush-brightness" min="0" max="255" value="255"></label>
+    <div class="matrix-setting" id="matrix-duration-row">
+      <label class="field-label" for="matrix-duration">Время показа</label>
+      <select id="matrix-duration">
+        <option value="5">5 секунд</option>
+        <option value="15">15 секунд</option>
+        <option value="30">30 секунд</option>
+        <option value="60" selected>1 минута</option>
+        <option value="300">5 минут</option>
+      </select>
+    </div>
+    <label class="range-label matrix-setting" id="matrix-display-row" for="matrix-display-brightness"><span>Яркость показа</span><output id="matrix-display-brightness-value">100%</output><input type="range" id="matrix-display-brightness" min="0" max="100" value="100"></label>
+  </div>
+  </div>
+
+  <div class="dialog-actions">
+    <button class="button primary" id="matrix-send" type="button">Показать на станции</button>
+    <button class="button subtle" id="matrix-stop" type="button">Остановить и очистить</button>
+    <button class="button subtle" id="matrix-native" type="button">Вернуть штатно</button>
+  </div>
+  <p class="note" id="matrix-state">—</p>
+</dialog>
+
+<dialog class="workspace-dialog screen-dialog" id="screen-dialog">
+  <div class="dialog-heading">
+    <div><p class="eyebrow">Экран станции</p><h2>Экран и пульт</h2></div>
+    <button class="icon-button" id="screen-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="screen-control-layout">
+    <div>
+      <div class="screen-viewport" id="screen-viewport">
+        <img id="screen-live-img" class="screen-image" alt="Экран станции">
+        <button class="button subtle screen-fullscreen-exit" id="screen-fullscreen-exit" type="button">Выйти</button>
+      </div>
+      <div class="screen-dialog-header">
+        <p id="screen-live-state">live-view</p>
+        <button class="button subtle" id="screen-snapshot" type="button">Снимок</button>
+        <button class="button subtle" id="screen-fullscreen" type="button">На весь экран</button>
+      </div>
+    </div>
+    <div class="remote-panel">
+      <div class="remote-top">
+        <button class="remote-key" data-key="power" type="button" title="Питание">⏻</button>
+        <button class="remote-key" data-key="wakeup" type="button" title="Разбудить">☀</button>
+        <button class="remote-key" data-key="home" type="button" title="Домой">⌂</button>
+      </div>
+      <div class="remote-dpad">
+        <button class="remote-key" data-key="dpad_up" style="grid-column:2;grid-row:1" type="button" title="Вверх">▲</button>
+        <button class="remote-key" data-key="dpad_left" style="grid-column:1;grid-row:2" type="button" title="Влево">◀</button>
+        <button class="remote-key key-ok" data-key="dpad_center" type="button" title="OK">OK</button>
+        <button class="remote-key" data-key="dpad_right" style="grid-column:3;grid-row:2" type="button" title="Вправо">▶</button>
+        <button class="remote-key" data-key="dpad_down" style="grid-column:2;grid-row:3" type="button" title="Вниз">▼</button>
+      </div>
+      <div class="remote-bottom">
+        <button class="remote-key" data-key="back" type="button" title="Назад">←</button>
+        <button class="remote-key" data-key="volume_down" type="button" title="Тише">−</button>
+        <button class="remote-key" data-key="volume_up" type="button" title="Громче">+</button>
+        <button class="remote-key" data-key="mute" type="button" title="Без звука">🔇</button>
+      </div>
+      <div class="remote-text-row">
+        <input id="screen-text-input" type="text" maxlength="120" placeholder="Текст для станции">
+        <button class="button subtle" id="screen-text-send" type="button">→</button>
+      </div>
+    </div>
+  </div>
+  <p class="note" id="screen-state">Тапните по экрану или используйте пульт. Свайп — жест.</p>
+</dialog>
+
+<dialog class="workspace-dialog" id="version-dialog">
+  <div class="dialog-heading">
+    <div><p class="eyebrow">Панель станции</p><h2>Версии</h2></div>
+    <button class="icon-button" id="version-close" type="button" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="version-current">
+    <div><strong id="version-current">v{{VERSION}}</strong><span id="version-built">сборка {{BUILD}}</span></div>
+    <span class="version-badge">эта панель</span>
+  </div>
+  <ul class="version-list">
+    <li>
+      <span class="version-tag">0.36.12</span>
+      <div><strong>Видео поверх Яндекс Музыки</strong><p>При переходе с AirPlay-аудио на видео панель больше не возвращает Яндекс Музыку и закрывает аудио-экран. Отладочный слой видео-приёмника с кодеком и битрейтом автоматически выключается и не перекрывает трансляцию.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.11</span>
+      <div><strong>Единые переключатели и живой статус ADB</strong><p>Все тумблеры в «Подключениях» приведены к размеру 40×24 с ровными отступами. После переключения ADB панель сама ждёт запуск сервиса и показывает «сервис запущен» или «сервис запускается».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.10</span>
+      <div><strong>Чёрный холст матрицы</strong><p>Фон клеток в «Рисунке» стал чистым чёрным, как погашенные пиксели на станции; сетка — нейтрально-серая. Остальная панель не менялась.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.9</span>
+      <div><strong>Переключатель ADB</strong><p>В разделе «Доступ» появился тумблер ADB по сети. Состояние сохраняется в настройке станции, сторож ADB его уважает: выключенный ADB больше не поднимается сам. Включить обратно можно тем же тумблером или по SSH.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.8</span>
+      <div><strong>Wi-Fi через систему</strong><p>Подключение теперь идёт через <code>WifiManager</code> (root-хелпер), а не напрямую в wpa_supplicant: сеть знает фреймворк, DHCP и сохранение штатные, он больше не откатывается на домашнюю сеть. Ошибка подключения прокручивается в видимую часть диалога. Старый путь через wpa_supplicant остался запасным.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.7</span>
+      <div><strong>Старт кольца внизу</strong><p>Предпросмотр кольца теперь начинается с нижней точки, как живое кольцо на обзоре, и идёт в том же направлении.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.6</span>
+      <div><strong>Живой предпросмотр кольца</strong><p>Предпросмотр больше не статичен: «Радуга» вращается, «Дыхание» пульсирует, «Свеча» мерцает, «Градиент» течёт. Анимации показываются реальными кадрами из <code>.led</code> с правильным направлением и удержанием финального кадра.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.5</span>
+      <div><strong>Настройки по вкладкам</strong><p>В «Анимациях» матрицы убраны яркость кисти, время показа и яркость матрицы — анимация запускается сразу по карточке. Вкладка «Анимации» переехала в конец. «Считать кадр» теперь последняя кнопка и только в «Рисунке».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.4</span>
+      <div><strong>Плавные циклы и кольцо</strong><p>Анимации матрицы собираются в один длинный GIF — больше нет чёрной паузы между повторами, тёмный хвост отрезается. У кольца одноразовые шаблоны держат финальный кадр («Слушает» заполняется и остаётся), направление движения развёрнуто по часовой, «Приветствие» переименовано в «Слышит настройку».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.3</span>
+      <div><strong>Глаза-сердечки</strong><p>В «Анимации» матрицы добавлены облачные «Глаза-сердечки» (emotions_v3/love) и «Успех» из кэша станции. Короткие анимации повторяются с запасом, чтобы не обрываться на середине.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.2</span>
+      <div><strong>Кольцо: родные анимации, окно матрицы</strong><p>В кольце появились вкладки «Ручное» и «Анимации»: 14 шаблонов из прошивки (слушает, думает, говорит, таймер, будильник, звонок и др.). Анимации подмигивания и подтверждения пересобраны в полные кадры — больше не рассыпаются. Окно матрицы вписано в экран, пять вкладок стоят в один ряд.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.1</span>
+      <div><strong>Матрица — только Glagol</strong><p>Рисунок, текст, GIF, видео, анимации, очистка и тест теперь уходят вендору командой <code>draw_led_screen</code> с локальным GIF. Прямая запись в fb4 из интерфейса убрана; fb4 остался только для чтения превью и для музыкальной визуализации.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.36.0</span>
+      <div><strong>Оригинальные анимации матрицы</strong><p>В управлении матрицей появилась вкладка «Анимации» с родными GIF со станции: глаза, подмигивание, сердце, разбитое сердце, радость, удивление, «слушает», «думает», «говорит», таймер, будильник, громкость, микрофон и другие. Файлы взяты из самой прошивки без перерисовки, превью в карточках анимированные.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.5</span>
+      <div><strong>Комната в имени видео</strong><p>Видео-приёмник больше не теряет комнату: «Станция Макс (Спальня) · Видео». Комната отбрасывается только если имя с суффиксом не помещается в строку списка AirPlay.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.4</span>
+      <div><strong>Короткие имена AirPlay</strong><p>Имя станции теперь укладывается в строку списка AirPlay: бренд «Яндекс» убирается, комната добавляется только если всё помещается. В диалоге видно, как имя будет выглядеть, и полное имя из Умного дома.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.3</span>
+      <div><strong>Тема не перезаписывается</strong><p>Вход в панель с другого браузера больше не заменяет акцент станции на локальный. Акцент меняется только при явном выборе палитры.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.2</span>
+      <div><strong>Имя видео-приёмника</strong><p>Выбранное имя AirPlay теперь применяется и к видео-приёмнику — с суффиксом «· Видео», чтобы аудио и видео различались в списке. Имя применяется при сохранении и при старте панели, в диалоге видно текущее имя видео.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.1</span>
+      <div><strong>Безопасность панели</strong><p>Пароль хранится как хэш PBKDF2-SHA256, открытый текст из конфига удаляется автоматически. Добавлена защита от перебора (блокировка IP после 5 попыток), проверка Origin для POST-запросов, защитные заголовки и отдельный приватный каталог для сессий и токенов. В настройках появилось предупреждение, если действует admin/admin.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.35.0</span>
+      <div><strong>Имя AirPlay</strong><p>Рядом с переключателем AirPlay появилась кнопка «Имя»: можно взять имя станции из Умного дома (с комнатой, если она назначена) или задать своё название. Имя применяется к аудиоприёмнику Shairport.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.9</span>
+      <div><strong>Мелкие правки интерфейса</strong><p>«Визуализация» и пульт теперь следуют теме; подпись Bluetooth обновлена под список сопряжённых; выбор режима кольца больше не сбрасывается опросом статуса; вместо битой заглушки обложки — нотка; у громкости убрана лишняя кнопка «Применить».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.8</span>
+      <div><strong>Тема без жёстких цветов</strong><p>Bluetooth, Wi-Fi, roadmap, recovery, диалоги и статусы переведены на переменные темы. При смене акцента (lime/mint/amber/ice/mono) больше не остаются зелёные элементы.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.7</span>
+      <div><strong>Bluetooth: только сопряжённые</strong><p>В окне Bluetooth остался только список сопряжённых устройств и их состояние. Поиск, сопряжение и кнопки подключения/отключения убраны — эти действия выполняются на экране станции.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.6</span>
+      <div><strong>Тема панели для AirPlay-видео</strong><p>Выбранный в панели акцент (lime, mint, amber, ice, mono) теперь сохраняется на станции в системной настройке и включается тёмный режим. Приёмник AirPlay-видео читает этот акцент при запуске и использует ту же тёмную палитру, что и веб-панель, — светлая тема больше не появляется. Заодно в приёмнике будет исправлен HLS-хендовер из Кинопоиска (master.m3u8 с query string и относительные URI).</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.5</span>
+      <div><strong>AirPlay-видео</strong><p>Для видео и зеркалирования поставлен отдельный открытый приёмник AirPlay. Он живёт на порту 7001 и представляется как «Yandex Station Max · Видео», поэтому не конфликтует с аудиоприёмником Shairport на 7000 и нашим экраном «Сейчас играет». В панели, в блоке «Экран и пульт», появилась кнопка «AirPlay видео» — она поднимает приёмник на ТВ. Для стабильного зеркалирования включено объявление поддержки звука экрана, иначе отправитель обрывает сессию примерно через минуту.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.4</span>
+      <div><strong>Возврат в Я.Музыку с ТВ</strong><p>На AirPlay-экране появились вкладки в стиле оригинала: «AirPlay | Я.Музыка». Вкладка «Я.Музыка» выбирается кнопкой «вверх», запускается кнопкой OK; также работает долгое удержание Back. AirPlay ставится на паузу, через пару секунд открывается оригинальная панель Я.Музыки. Восемь секунд панель не отбирает экран обратно, поэтому переключение не срывается; если снова запустить AirPlay с телефона, экран AirPlay вернётся сам.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.3</span>
+      <div><strong>Быстрый возврат Я.Музыки</strong><p>Двухминутное ожидание убрано. Если телефон разорвал AirPlay-сессию, экран Я.Музыки возвращается через 5 секунд; если сессия ещё жива (например, пауза), запас 20 секунд. Явное выключение AirPlay в панели сразу возвращает Я.Музыку, не дожидаясь таймера. Экран возвращается в лаунчер без отбора фокуса, если ты всё ещё на нашем ТВ-экране.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.2</span>
+      <div><strong>Ровный прогресс и экран Я.Музыки</strong><p>Прогресс-бар больше не сбрасывается: ТВ-приложение держит один цикл опроса и отбрасывает устаревшие ответы, а панель не принимает недописанную строку прогресса и резкие откаты позиции внутри трека. Бар и время на ТВ обновляются каждые 200 мс, поэтому движение плавное. На время AirPlay отключается только экран Я.Музыки (HostActivity), а не весь пакет: сам плеер живёт в com.yandex.io.sdk, и пакет остаётся доступным. После простоя экран возвращается, фокус у нашего ТВ-экрана не отбирается.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.1</span>
+      <div><strong>ТВ-экран и быстрый пульт</strong><p>Экран «Сейчас играет» на ТВ догнал оригинал: белый прогресс-бар с ползунком, без нижней подписи с кнопками. Приложение AirPlay появилось во вкладке «Приложения и сервисы» (Leanback-запуск, иконка и баннер), так что вернуться на экран можно прямо с телевизора. Команды пульта отвечают сразу: панель отдаёт ответ до отправки в приёмник, после нажатия идёт учащённый опрос метаданных, а переключение трека и пауза показываются оптимистично. Переключатель визуализации убран из панели — режим по-прежнему задаётся в «Умном Доме», панель показывает его read-only.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.34.0</span>
+      <div><strong>AirPlay 2 и тёплый поток</strong><p>Панель сама поднимает NQPTP, готовит shm от имени приложения, ставит совместимый запуск и перезапускает приёмник в AirPlay 2. Добавлено подавление эха громкости в приёмнике: после pvol от телефона значение не отправляется обратно 2.5 секунды. На паузе штатный плеер получает тишину, поэтому resume идёт без перезапуска пайплайна и лишнего лага.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.33.2</span>
+      <div><strong>Подключения и компоновка</strong><p>AirPlay и визуализация переехали в блок «Подключения» к Wi-Fi, Bluetooth, Live-view и «Экран и пульт». Блок растягивается по высоте соседних карточек, у последнего пункта появился нижний отступ. «Скажите Алисе» перенесено в карточку станции, над строкой «обновлено / SSH + ADB». Дублирующая строка с названием и исполнителем у AirPlay убрана, «Состояние доступа» удалено.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.33.1</span>
+      <div><strong>Пауза AirPlay и прямое управление</strong><p>Пауза AirPlay больше не выглядит как «сессия пропала»: панель запоминает последний трек, обложку и исполнителя и держит переключатель источника доступным. Команды play/pause/next/prev идут напрямую сервису приёмника, а не через Android-медиасессию, которая после паузы переключается на Glagol. Это должно убрать запуск Яндекс Музыки вместо продолжения AirPlay.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.33.0</span>
+      <div><strong>Выбор источника и громкость</strong><p>В карточке музыки появился переключатель «AirPlay / Я.Музыка»: play/pause и переключение трека управляют выбранным источником. AirPlay определяется и на паузе по живому RTSP-соединению, поэтому кнопка play больше не запускает Яндекс Музыку вместо продолжения AirPlay. Если с телефона начинается новый трек, AirPlay автоматически забирает управление и останавливает Glagol. Физическая шайба громкости теперь повторно рассылает изменение, чтобы приёмник отправил новое значение на iPhone.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.32.0</span>
+      <div><strong>Обложка и метаданные AirPlay</strong><p>Карточка «Музыка и громкость» теперь показывает обложку, название и исполнителя трека, который играет по AirPlay. Статус источника стал явным: «Играет: AirPlay» или «Играет: Я.Музыка», для паузы — «Пауза: AirPlay» / «Пауза: Я.Музыка». Кнопки play/pause и переключения трека в карточке управляют активным источником. Обложка берётся из кэша artwork Shairport и отдаётся панелью.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.31.0</span>
+      <div><strong>Штатная визуализация AirPlay</strong><p>При воспроизведении с iPhone звук теперь идёт в родной плеер станции: приёмник работает в silent-режиме, отдаёт PCM, панель поднимает локальный WAV-поток и запускает его через audio_play. Матрицу рисует тот же SpectrogramAnimation, что и в оригинале, поэтому картинка совпадает с настройкой из «Умного Дома» — включая пламя и Box2D-физику. Панель показывает текущий режим read-only, собственный селектор в native-режиме скрыт. Пауза и стоп AirPlay останавливают поток.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.30.1</span>
+      <div><strong>Сглаживание и фейдинг как в оригинале</strong><p>Добавлено дробнооктавное сглаживание соседних полос, быстрая атака и плавный спад 0.90, а у «Пламени» — мягкое размытие края. Верхние кромки больше не рисуются резкой белой линией: яркость к краю затухает.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.30.0</span>
+      <div><strong>Шесть режимов по вашим видео</strong><p>Разобраны все шесть записей: «Полосы», «Полосы симметрично», «Прямоугольники», «Блоки», «Пламя», «Пламя симметрично». Формы повторены по кадрам матрицы. Шкала высот переведена с AGC на фиксированные −70…0 дБ, как у штатного спектра станции.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.29.3</span>
+      <div><strong>Штатные пресеты визуализации</strong><p>Из логов станции вытащены настоящие названия режимов: bricksSmall, barsBottom, barsCenter, pads, wave, flame. Для трёх из них сняты точные кадры 25×16 и сделаны такие же виды: «Кирпичи», «Полосы снизу», «Полосы по центру». «Волна» повторяет сплошную гору, «Блоки» — крупные площадки, «Пламя» — плавный текучий спектр.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.29.2</span>
+      <div><strong>Стиль «Полосы»</strong><p>Добавлен ещё один родной вид: тонкие столбики через один, как в демонстрации визуализаций Станции Макс. Он доступен в выборе стилей и в режиме «Авто».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.29.1</span>
+      <div><strong>Форма спектра ближе к штатной</strong><p>Визуализация теперь рисует не отдельные столбики, а непрерывную «гору» со сглаженной кромкой, как у штатного эквалайзера станции. Добавлен стиль «Классика» — белый спектр, как в оригинале; LavaBeat, PolarShining и Blink используют ту же форму со своими цветами.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.29.0</span>
+      <div><strong>Визуализация на AudioTap: LavaBeat, PolarShining, Blink</strong><p>Спектр AirPlay теперь берётся через AudioTap приёмника — звук больше не пропадает. На матрице три стиля: тёплый LavaBeat, холодный PolarShining и блочный Blink, плюс режим «Авто». Стиль выбирается в «Музыке и громкости».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.28.1</span>
+      <div><strong>Визуализация временно выключена</strong><p>Захват системного звука через REMOTE_SUBMIX забирал звук у AirPlay, поэтому эксперимент отключён. Ищу, как включить встроенную визуализацию станции без вмешательства в аудиопоток.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.27.0</span>
+      <div><strong>Перемотка трека и AirPlay</strong><p>В «Музыке и громкости» появилась полоса прогресса: видно, сколько прошло и сколько осталось, а перетаскиванием можно перемотать трек. Добавлен классический AirPlay-приёмник: переключатель в панели, название трека с телефона, автопауза Яндекс Музыки и краткий показ трека на матрице.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.26.0</span>
+      <div><strong>Быстрый пульт и 8 кадров в секунду</strong><p>Нажатия кнопок и тапы уходят через резидентный помощник ввода: отклик в панели падает с ~0,8 с до десятков миллисекунд. Превью матрицы и кольца обновляется 8 раз в секунду без искусственных пауз.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.25.3</span>
+      <div><strong>Баланс live-view и задержка экрана</strong><p>Матрица и кольцо в панели обновляются плавнее — 6,7 раза в секунду, но замирают, пока крутится шайба громкости. Экран отдаётся в 800×450 JPEG q50, кадры отправляются быстрее — задержка в дашборде ниже.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.25.2</span>
+      <div><strong>Live-view после выключения</strong><p>Повторное включение снова рисует матрицу и кольцо: сбрасывается кэш последнего кадра, из-за которого превью оставалось пустым до перезагрузки страницы.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.25.1</span>
+      <div><strong>Live-view не мешает громкости</strong><p>Поток матрицы и кольца опрашивается реже и замирает, пока крутится шайба громкости. Повторное включение Live-view пересоздаёт поток — перезагружать страницу больше не нужно.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.25.0</span>
+      <div><strong>Матрица: конечные GIF и возврат к часам</strong><p>Анимации теперь конечные: панель повторяет короткий GIF до конца показа и сама возвращает штатные часы. Длинный показ больше не блокирует вендорный плеер. GIF-сервер поднимается после загрузки станции.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.24.4</span>
+      <div><strong>Матрица: пять минут и надёжные GIF</strong><p>GIF-сервер теперь поднимается после загрузки станции, даже если первый bind не удался — раньше после ребута анимации не скачивались. Ассеты живут 10 минут. Пятиминутный показ пройден: анимация не оборвалась.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.24.3</span>
+      <div><strong>Длинные показы матрицы</strong><p>GIF-ассеты теперь живут 10 минут, чтобы длинная анимация не оборвалась на середине. Проверен пятиминутный показ.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.24.2</span>
+      <div><strong>Память под контролем</strong><p>GIF-ассеты матрицы теперь удаляются по истечении срока, а не только при следующей загрузке. Добавлена внутренняя диагностика памяти (heap, goroutines, RSS) для проверки утечек.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.24.1</span>
+      <div><strong>Меньше нагрузки на станцию</strong><p>Статус кэшируется, проверка апдейтера идёт раз в минуту, громкость берётся из Glagol вместо запуска <code>media volume</code>. Скрытые вкладки больше не опрашивают панель, а крупные служебные сообщения Glagol не разбираются.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.24.0</span>
+      <div><strong>Музыка и голос через Glagol</strong><p>Панель показывает текущий трек, исполнителя, обложку и состояние (играет/пауза). Play/pause, next и prev идут через Glagol, с резервом на медиа-клавиши. Появилась отправка текста Алисе. Заодно исправлен переключатель Bluetooth, который мог застрять в выключенном виде.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.23.1</span>
+      <div><strong>Bluetooth из обзора</strong><p>В блоке «Доступ» на обзоре у Bluetooth появилась стрелка — она сразу открывает список устройств, как у Wi-Fi.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.23.0</span>
+      <div><strong>Bluetooth-устройства</strong><p>В карточке Bluetooth появился раздел «Устройства»: список сопряжённых, подключение и отключение, удаление, BLE-поиск и сопряжение. Для классических устройств — подбор на экране станции.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.5</span>
+      <div><strong>Значок «Возможностей»</strong><p>У вкладки «Возможности» появился свой значок — раньше он ссылался на отсутствующий символ и не отображался.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.4</span>
+      <div><strong>Крупнее интерфейс</strong><p>Вся панель увеличена до 115% — как при масштабировании страницы в браузере. Текст, кнопки и карточки стали заметно крупнее.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.3</span>
+      <div><strong>Живой экран через minicap</strong><p>Live-экран переведён на нативный minicap: кадры 960×540 приходят на лету, во время анимаций — до 25–40 к/с вместо 6–7. Статичный экран не тратит трафик, а при открытии сразу показывается текущий кадр.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.2</span>
+      <div><strong>Быстрый экран и цветной значок</strong><p>Live-экран снимается тремя параллельными потоками screencap: около 6–7 к/с вместо 2–3. Значок сайта и theme-color теперь окрашиваются в акцент выбранной темы.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.1</span>
+      <div><strong>Экран на обзоре</strong><p>Кнопка «Экран и пульт» в блоке «Доступ». Live-экран больше не шлёт дубли кадров, меньше грузит станцию и работает стабильнее. Ограничение остаётся в screencap — около 3 к/с.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.22.0</span>
+      <div><strong>Экран и пульт</strong><p>Live-экран станции, тапы и свайпы, D-pad, OK, назад/домой, пробуждение, громкость и ввод текста. Экран уважает переключатель live-view.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.21.3</span>
+      <div><strong>Один live-поток</strong><p>Матрица и кольцо теперь приходят по одному SSE-соединению. Меньше нагрузка на станцию, а окно Wi-Fi больше не зависает при включённом live-view.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.21.2</span>
+      <div><strong>Сохранённые сети</strong><p>В окне Wi-Fi появился список сохранённых сетей с кнопкой «Забыть» — в том числе для сетей вне зоны действия. Плюс чистка временных файлов.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.21.1</span>
+      <div><strong>Матрица без fb4</strong><p>Убран ложный таймаут WebSocket через 5 минут простоя. Перед отрисовкой панель быстро переподключается, поэтому текст → узор больше не сваливается на fb4.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.21.0</span>
+      <div><strong>Wi-Fi на обзоре</strong><p>Настройка Wi-Fi прямо из блока «Доступ», уровень сигнала в виде палочек, переключатель live-view и гарантированное сохранение новых сетей в WifiConfigStore.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.20.0</span>
+      <div><strong>Wi-Fi из панели</strong><p>Список сетей, подключение по паролю, переподключение сохранённой сети и «забыть сеть». Пароль не сохраняется в панели. Новую сеть станция может не сохранить после перезагрузки.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.19.0</span>
+      <div><strong>Профили и видео</strong><p>Профили кольца сохраняются на станции. В матрице появилась вкладка «Видео»: браузер разбирает короткий ролик на кадры 25×16 и отправляет их на станцию. Плюс правки мобильной вёрстки.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.18.2</span>
+      <div><strong>Кольцо: эффекты и плавный live-view</strong><p>Вернулись «Дыхание», «Радуга», «Градиент» и «Свеча». Кольцо рисуется через fb5, live-view отдаёт кадр из памяти и больше не лагает. После изменения громкости цвет возвращается через пару секунд.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.18.1</span>
+      <div><strong>Назад к часам</strong><p>«Вернуть штатно» снова показывает часы: панель останавливает анимацию коротким конечным кадром и принудительно перерисовывает часы через Glagol. Кольцо возвращается вендорному драйверу через trigger <code>led_ring_fb</code>, а его live-view теперь читает fb5.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.18.0</span>
+      <div><strong>Вендорный движок</strong><p>Матрица и громкость работают через локальный API станции (Glagol): рисунок, текст, GIF и штатное изменение громкости без поломки индикации на кольце. Токен устройства берётся автоматически и не хранится в панели; если API недоступен, панель откатывается на fb4.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.17.3</span>
+      <div><strong>Кольцо без сюрпризов</strong><p>Непрерывные анимации кольца отключены: они гасили штатную индикацию громкости до перезагрузки. Остались «штатно», «ровно» и «выкл».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.17.2</span>
+      <div><strong>Кольцо на максимуме</strong><p>На 100 % громкости вендор оставляет один сегмент погашенным — live-view теперь замыкает круг.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.17.1</span>
+      <div><strong>Порядок в матрице</strong><p>Исправлены отступы и прокрутка в окне управления матрицей. Версия панели теперь видна внизу слева и переживает перезапуски.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.17.0</span>
+      <div><strong>Кольцо и порядок</strong><p>Живое кольцо на картинке станции, бесшовная отрисовка, защита LED-драйвера от нулей, сессии переживают перезапуск, удалён Bad Apple.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.16.0</span>
+      <div><strong>Bad Apple</strong><p>Оригинальный ролик со звуком и покадровой синхронизацией. Убран в 0.17.0.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.15.0</span>
+      <div><strong>Live-view</strong><p>SSE-поток матрицы, кэш кадров, ускорение редактора и предпросмотров.</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.14.0</span>
+      <div><strong>Кольцо</strong><p>Ручные режимы, штатное управление, живой предпросмотр, «Вернуть штатно».</p></div>
+    </li>
+    <li>
+      <span class="version-tag">0.13.0</span>
+      <div><strong>Панель</strong><p>Обзор, доступ, журнал, резервные копии, настройки и консоль.</p></div>
+    </li>
+  </ul>
+  <p class="note">Номер версии задаётся в <code>station-web/VERSION</code> и вшивается в бинарник при сборке.</p>
+</dialog>
+
+<div id="toast" class="toast hidden"><span id="toast-text"></span><button id="toast-undo" type="button">Отменить</button></div>
+<script src="/app.js?v=67"></script>
+</body>
+</html>

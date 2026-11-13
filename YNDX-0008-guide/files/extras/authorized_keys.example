@@ -1,0 +1,9 @@
+# Сюда положите ВАШ публичный SSH-ключ (одна строка), затем:
+#   adb push authorized_keys /data/local/tmp/station-max-extras/authorized_keys
+#
+# Ключ создаётся на компьютере:
+#   ssh-keygen -t ed25519 -f station_key
+#   (Windows) type station_key.pub > authorized_keys
+#   (Linux/macOS) cp station_key.pub authorized_keys
+#
+# Приватный ключ station_key НИКОМУ не передавайте и в архив не кладите.

@@ -1,0 +1,76 @@
+# --- большие тулчейны: ставятся отдельно, см. RELEASE.md
+stage/android-sdk/
+stage/corretto21/
+stage/jdk21/
+stage/winlibs/
+stage/perl-lib/
+stage/minicap-npm/
+stage/minicap-pre/
+stage/airplay_apk/
+stage/bt/*.jar
+platform-tools/
+*.zip
+*.7z
+
+# вложенные upstream-репозитории
+**/.git/
+
+# --- отдельные продукты, живут вне релизного репозитория
+lite-kit/
+station-control/
+github/
+github-export.tar
+
+# --- артефакты сборки
+**/build/
+**/.gradle/
+**/node_modules/
+dist/
+station-web/station-web_linux_arm64
+stage/airplay_video/src/app/src/main/cpp/third_party/*/build*/
+*.o
+*.a
+*.so
+*.class
+*.dex
+*.idsig
+
+# APK: только официальный приёмник для отката
+*.apk
+!stage/airplay_video/airplay-receiver.apk
+
+# --- бинарные артефакты и тестовые дампы
+*.tar.gz
+*.wav
+*.bin
+*.png
+stage/capture/
+stage/capture*
+stage/fetch_page
+stage/fetch_page*
+stage/captured-frame.json
+research/agent-arm64
+research/agent_strings.py
+stage/absshd_host_ed25519
+stage/absshd_host_ed25519.pub
+agent-arm64
+absshd/absshd_linux_arm64
+YNDX-0008-guide/files/extras/absshd
+
+# --- секреты
+stage/ssh/
+*.pem
+*.key
+*.jks
+
+# --- отладочные дампы и данные устройства
+stage/airplay_video/debug/
+stage/airplay_video/src/app/src/main/cpp/third_party/
+stage/led_assets/
+stage/wifi/classes/
+stage/wifi/dexout/
+stage/videos/
+**/*.log
+**/*.db
+**/*.b64
+stage/airplay_video/devices.json

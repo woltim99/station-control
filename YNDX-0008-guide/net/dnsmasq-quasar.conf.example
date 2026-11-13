@@ -1,0 +1,36 @@
+# Пример dnsmasq: подмена только трёх имён для станции + блок OTA.
+# Вставьте в /etc/dnsmasq.d/quasar.conf (или в конец dnsmasq.conf),
+# замените 192.168.1.10 на IP машины с Nginx, перезапустите dnsmasq.
+#
+# ВАЖНО: ограничьте действие этих правил станцией. Если dnsmasq обслуживает
+# всю сеть — остальные клиенты тоже увидят подмену. Проще всего поднять
+# отдельный dnsmasq и отдать его станции через DHCP-резерв.
+
+# --- ADB bootstrap: эти имена ведут на Nginx ---
+address=/quasar.yandex.net/192.168.1.10
+address=/quasar.yandex.ru/192.168.1.10
+address=/scbh.yandex.net/192.168.1.10
+# Не отправлять остальные типы запросов (AAAA/MX/...) для этих зон наружу:
+local=/quasar.yandex.net/
+local=/quasar.yandex.ru/
+local=/scbh.yandex.net/
+
+# --- OTA / firmware: в loopback ---
+address=/updater.mobile.yandex.net/127.0.0.1
+address=/quasar.s3.yandex.net/127.0.0.1
+local=/updater.mobile.yandex.net/
+local=/quasar.s3.yandex.net/
+
+# AAAA для подменяемых/блокируемых имён: либо ::1, либо отключить AAAA.
+address=/quasar.yandex.net/::1
+address=/quasar.yandex.ru/::1
+address=/scbh.yandex.net/::1
+address=/updater.mobile.yandex.net/::1
+address=/quasar.s3.yandex.net/::1
+# Если IPv6 в сети нет, можно глобально:
+# filter-AAAA
+
+# --- НЕ трогать: Алиса, музыка, видео ---
+# rpc.alice.yandex.net, uniproxy.alice.yandex.net, alice.yandex.net,
+# alice-ats.yandex.net, strm.yandex.ru, quasar.yandex.net (основной бэкенд)
+# должны идти обычным DNS. Блокировка strm.yandex.ru ломает видео.

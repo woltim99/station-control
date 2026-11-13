@@ -1,0 +1,12 @@
+# ADB over TCP + watchdog.
+# Кладётся в /odm/etc/init/adbd_tcp.rc, применяется после перезагрузки.
+service adbguard /system/bin/sh /odm/bin/adbguard.sh
+    class main
+    user root
+    group root
+    seclabel u:r:shell:s0
+    disabled
+
+on property:sys.boot_completed=1
+    setprop service.adb.tcp.port 5555
+    start adbguard

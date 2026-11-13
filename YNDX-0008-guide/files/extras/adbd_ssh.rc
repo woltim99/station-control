@@ -1,0 +1,21 @@
+# ADB over TCP + watchdog + root SSH (absshd).
+# Кладётся в /odm/etc/init/adbd_tcp.rc, применяется после перезагрузки.
+service adbguard /system/bin/sh /odm/bin/adbguard.sh
+    class main
+    user root
+    group root
+    seclabel u:r:shell:s0
+    disabled
+
+service absshd /odm/bin/absshd -addr 0.0.0.0:2222 -hostkey /data/local/tmp/absshd/host_ed25519 -authorized_keys /odm/etc/absshd/authorized_keys -log /data/local/tmp/absshd/sshd.log
+    class main
+    user root
+    group root
+    seclabel u:r:shell:s0
+    oneshot
+    disabled
+
+on property:sys.boot_completed=1
+    setprop service.adb.tcp.port 5555
+    start adbguard
+    start absshd

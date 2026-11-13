@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.opencode.stationviz">
+
+    <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="28" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.hkfuertes.shairport.permission.AUDIO_TAP" />
+
+    <application
+        android:allowBackup="false"
+        android:label="Station Viz">
+        <service
+            android:name=".VizService"
+            android:exported="true" />
+    </application>
+</manifest>

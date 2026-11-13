@@ -1,0 +1,39 @@
+# Пример Nginx для первичного включения ADB на Станции Макс (0921).
+# Сертификаты берутся из eQuasar (см. README, раздел «ADB»):
+#   /etc/nginx/certs/fullchain.pem
+#   /etc/nginx/certs/quasar-all.key
+# Замените 192.168.1.10 на IP этого сервера и пути к сертификатам.
+
+# HTTP: только generate_204, остальное — на HTTPS.
+server {
+    listen 80;
+    server_name quasar.yandex.net quasar.yandex.ru scbh.yandex.net;
+
+    location = /generate_204 { return 204; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    server_name quasar.yandex.net quasar.yandex.ru scbh.yandex.net;
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/quasar-all.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    default_type application/json;
+
+    location = /generate_204 { return 204; }
+
+    location = /get_sync_info {
+        add_header Cache-Control no-store;
+        return 200 '{"status":"ok","config":{"account_config":{"spotter":"alisa"},"device_config":{"name":"quasar"},"system_config":{"adbd":{"remoteActivation":true,"network":true},"com.yandex.tv.services.platform":{"adbEnabled":true,"developmentSettingsEnabled":true}}},"subscription":{"mode":"transaction"}}';
+    }
+
+    location = /confirm_update { return 200 'false'; }
+    location = /check_updates  { return 200 '{"hasUpdate":false}'; }
+    location = /allow_update   { return 200 '{"allow":false}'; }
+
+    # Обновления и всё остальное — отказ.
+    location / { return 403; }
+}
